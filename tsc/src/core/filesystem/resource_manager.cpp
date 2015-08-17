@@ -18,6 +18,8 @@
 #include <windows.h>
 #elif defined(__linux)
 #include <limits.h>
+#elif defined(__APPLE__)
+#include <mach-o/dyld.h>
 #endif
 
 #include "resource_manager.hpp"
@@ -288,6 +290,14 @@ void cResource_Manager::init_directories()
         throw(ConfigurationError("Failed to retrieve the executable's path from /proc/self/exe!"));
 
     m_paths.game_data_dir = utf8_to_path(std::string(path_data, count)).parent_path().parent_path() / utf8_to_path("share") / utf8_to_path("tsc");
+#elif __APPLE__
+    char path_data[PATH_MAX];
+    int count;
+    count = _NSGetExecutablePath(path_data, ((uint32_t*)PATH_MAX));
+    if (count < 0)
+        throw(ConfigurationError("Failed to retrieve the executable's path from _NSGetExecutablePath"));
+
+    m_paths.game_data_dir = utf8_to_path(std::string(path_data, count)).parent_path().parent_path() / utf8_to_path("share") / utf8_to_path("tsc");
 #elif _WIN32
     wchar_t path_data[MAX_PATH];
     if (GetModuleFileNameW(NULL, path_data, MAX_PATH) == 0)
@@ -305,6 +315,10 @@ void cResource_Manager::init_directories()
     m_paths.user_data_dir = xdg_get_directory("XDG_DATA_HOME", ".local/share") / utf8_to_path("tsc");
     m_paths.user_cache_dir = xdg_get_directory("XDG_CACHE_HOME", ".cache") / utf8_to_path("tsc");
     m_paths.user_config_dir = xdg_get_directory("XDG_CONFIG_HOME", ".config") / utf8_to_path("tsc");
+#elif __APPLE__
+    m_paths.user_data_dir = fs::current_path() / utf8_to_path("data");
+    m_paths.user_cache_dir = fs::current_path() / utf8_to_path("data") / utf8_to_path("cache");
+    m_paths.user_config_dir = fs::current_path() / utf8_to_path("data");
 #elif _WIN32
     wchar_t path_appdata[MAX_PATH + 1];
 

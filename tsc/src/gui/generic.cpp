@@ -444,13 +444,13 @@ std::string Get_Clipboard_Content(void)
     }
 #elif __APPLE__
     // not tested
-    ScrapRef scrap;
-    if (::GetCurrentScrap(&scrap) != noErr) {
+    /*ScrapRef scrap;
+    if (GetCurrentScrap(&scrap) != noErr) {
         return false;
     }
 
     Size bytecount = 0;
-    OSStatus status = ::GetScrapFlavorSize(scrap, kScrapFlavorTypeText, &bytecount);
+    OSStatus status = GetScrapFlavorSize(scrap, kScrapFlavorTypeText, &bytecount);
     if (status != noErr) {
         return false;
     }
@@ -460,7 +460,7 @@ std::string Get_Clipboard_Content(void)
         content = static_cast<char*>(buffer);
     }
 
-    delete[] buffer;
+    delete[] buffer;*/
 #elif __unix__
     // only works with the cut-buffer method (xterm) and not with the more recent selections method
     SDL_SysWMinfo sdlinfo;
